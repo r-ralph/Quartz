@@ -16,23 +16,75 @@
 
 package ms.ralph.quartz.compiler
 
+import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.TypeSpec
+import ms.ralph.quartz.Optional
+import ms.ralph.quartz.Required
+import ms.ralph.quartz.compiler.util.Constant.CLASS_NAME_SUFFIX
 import ms.ralph.quartz.compiler.util.note
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
-import javax.lang.model.element.Modifier
 
 /**
  * Code generator class
  */
 object QuartzGenerator {
+    /**
+     * Create IntentBuilder Java file for annotated class
+     *
+     * @param packageName Package name of target class
+     * @param element     Annotated class information
+     * @param messager    Logger object
+     */
     fun createJavaFile(packageName: String, element: Element, messager: Messager): JavaFile {
-        val className = "${element.simpleName}IntentBuilder"
+        val className = "${element.simpleName}$CLASS_NAME_SUFFIX"
+        val classSpec = ClassName.get(packageName, className)
         messager.note("Start: $className")
-        val logger = TypeSpec.classBuilder(className)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+
+        val requiredElements = searchRequiredElements(element)
+        val optionalElements = searchOptionalElements(element)
+
+        val classInfo = ClassBuilder(className)
+                .setSignature()
+                .createFields(requiredElements, optionalElements)
+                .createConstructor(requiredElements)
+                .createCreateMethod(requiredElements)
+                .createOptionalMethods(optionalElements)
+                .createBuildMethod(classSpec)
                 .build()
-        return JavaFile.builder(packageName, logger).build()
+        return JavaFile.builder(packageName, classInfo).build()
+    }
+
+    /**
+     * Search annotated field with @Required
+     *
+     * @param element Annotated class information
+     */
+    private fun searchRequiredElements(element: Element): Array<Element> {
+        return searchElement(element, Required::class.java)
+    }
+
+    /**
+     * Search annotated field with @Optional
+     *
+     * @param element Annotated class information
+     */
+    private fun searchOptionalElements(element: Element): Array<Element> {
+        return searchElement(element, Optional::class.java)
+    }
+
+    /**
+     * Search annotated field
+     *
+     * @param element Annotated class information
+     * @param klass   Annotation class
+     */
+    private fun searchElement(element: Element, klass: Class<out Annotation>): Array<Element> {
+        val list = arrayListOf<Element>()
+        element.enclosedElements.forEach {
+            it.getAnnotation(klass)?.apply { list.add(it) }
+        }
+        return list.toTypedArray()
+
     }
 }
