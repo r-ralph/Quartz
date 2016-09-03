@@ -5,8 +5,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.3'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "com.android.tools.build:gradle:$GRADLE_PLUGIN_VERSION"
+        classpath "com.neenbedankt.gradle.plugins:android-apt:$APT_PLUGIN_VERSION"
     }
 }
 
