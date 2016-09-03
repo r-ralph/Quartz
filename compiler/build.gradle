@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'kotlin'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
@@ -14,7 +14,10 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', '../library/src/main/java']
+            srcDirs = [
+                    'src/main/kotlin',
+                    '../library/src/main/java'
+            ]
         }
     }
 }
