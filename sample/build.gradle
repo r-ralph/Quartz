@@ -23,6 +23,9 @@ android {
     }
 }
 
+kapt {
+    generateStubs = true
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -32,4 +35,5 @@ dependencies {
 
     compile project(':library')
     kapt project(':compiler')
+    provided project(':compiler')
 }
