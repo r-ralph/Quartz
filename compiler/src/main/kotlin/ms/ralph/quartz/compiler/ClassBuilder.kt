@@ -134,7 +134,7 @@ class ClassBuilder(className: String) {
                 .returns(INTENT_CLASS)
                 .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, activityClassSpec)
                 .addStatement("\$T \$L = new \$T()", BUNDLE_CLASS, BUNDLE_PARAMETER_NAME, BUNDLE_CLASS)
-                .apply { fields.forEach { addStatement("\$T.\$N(\$N, \$N)", QUARTZ_UTIL_CLASS, PUT_METHOD_NAME, BUNDLE_PARAMETER_NAME, it.name) } }
+                .apply { fields.forEach { addStatement("\$T.\$N(\$N, \$S, \$N)", QUARTZ_UTIL_CLASS, PUT_METHOD_NAME, BUNDLE_PARAMETER_NAME, it.name.toUpperCase(), it.name) } }
                 .addStatement("\$L.\$N(\$L)", INTENT_PARAMETER_NAME, PUT_EXTRAS_METHOD_NAME, BUNDLE_PARAMETER_NAME)
                 .addStatement("return \$L", INTENT_PARAMETER_NAME)
                 .build()
