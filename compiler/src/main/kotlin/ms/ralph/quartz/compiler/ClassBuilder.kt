@@ -25,6 +25,8 @@ import ms.ralph.quartz.compiler.util.Constant.CREATE_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.INTENT_PARAMETER_NAME
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.Modifier.PRIVATE
+import javax.lang.model.element.Modifier.STATIC
 
 /**
  * Wrapper of TypeSpec.Builder
@@ -49,7 +51,7 @@ class ClassBuilder(className: String) {
      * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
     fun createFields(requiredElements: Array<Element>, optionalElements: Array<Element>): ClassBuilder = this.apply {
-        builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, Modifier.PRIVATE).build())
+        builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, PRIVATE).build())
         // requiredElements
         // optionalElements
     }
@@ -61,7 +63,7 @@ class ClassBuilder(className: String) {
      */
     fun createConstructor(requiredElements: Array<Element>): ClassBuilder = this.apply {
         val constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(PRIVATE)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
                 //.addParameters(requiredElements.mapToParameterSpec)
                 .addStatement("this.\$L = \$L", CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_NAME)
@@ -77,7 +79,7 @@ class ClassBuilder(className: String) {
      */
     fun createCreateMethod(requiredElements: Array<Element>): ClassBuilder = this.apply {
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(PRIVATE, STATIC)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
                 //.addParameters(requiredElements.mapToParameterSpec)
                 .build()
