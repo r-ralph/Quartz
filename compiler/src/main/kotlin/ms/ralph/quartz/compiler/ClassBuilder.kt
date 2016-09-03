@@ -23,15 +23,14 @@ import ms.ralph.quartz.compiler.util.Constant
 import ms.ralph.quartz.compiler.util.Constant.CONTEXT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CREATE_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.INTENT_PARAMETER_NAME
+import ms.ralph.quartz.compiler.util.mapToParameterSpec
 import javax.lang.model.element.Element
-import javax.lang.model.element.Modifier
-import javax.lang.model.element.Modifier.PRIVATE
-import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.element.Modifier.*
 
 /**
  * Wrapper of TypeSpec.Builder
  */
-class ClassBuilder(className: String) {
+class ClassBuilder(val packageName: String, val className: String) {
     /**
      * Class builder
      */
@@ -41,7 +40,7 @@ class ClassBuilder(className: String) {
      * Set modifier to <code>public final</code> class
      */
     fun setSignature(): ClassBuilder = this.apply {
-        builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+        builder.addModifiers(PUBLIC, FINAL)
     }
 
     /**
@@ -50,10 +49,14 @@ class ClassBuilder(className: String) {
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
-    fun createFields(requiredElements: Array<Element>, optionalElements: Array<Element>): ClassBuilder = this.apply {
+    fun createFields(requiredElements: List<Element>, optionalElements: List<Element>): ClassBuilder = this.apply {
         builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, PRIVATE).build())
-        // requiredElements
-        // optionalElements
+        requiredElements.forEach {
+            builder.addField(FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build())
+        }
+        optionalElements.forEach {
+            builder.addField(FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build())
+        }
     }
 
     /**
@@ -61,13 +64,13 @@ class ClassBuilder(className: String) {
      *
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createConstructor(requiredElements: Array<Element>): ClassBuilder = this.apply {
+    fun createConstructor(requiredElements: List<Element>): ClassBuilder = this.apply {
         val constructor = MethodSpec.constructorBuilder()
                 .addModifiers(PRIVATE)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
-                //.addParameters(requiredElements.mapToParameterSpec)
+                .addParameters(requiredElements.mapToParameterSpec())
                 .addStatement("this.\$L = \$L", CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_NAME)
-                //.addStatement()
+                .apply { requiredElements.map { it.simpleName.toString() }.forEach { addStatement("this.\$L = \$L", it, it) } }
                 .build()
         builder.addMethod(constructor)
     }
@@ -77,11 +80,15 @@ class ClassBuilder(className: String) {
      *
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createCreateMethod(requiredElements: Array<Element>): ClassBuilder = this.apply {
+    fun createCreateMethod(requiredElements: List<Element>): ClassBuilder = this.apply {
+        val selfClass = ClassName.get(packageName, className)
+        val requiredArguments = requiredElements.map { it.simpleName.toString() }.joinToString(", ", ", ")
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
-                .addModifiers(PRIVATE, STATIC)
+                .addModifiers(PUBLIC, STATIC)
+                .returns(selfClass)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
-                //.addParameters(requiredElements.mapToParameterSpec)
+                .addParameters(requiredElements.mapToParameterSpec())
+                .addStatement("return new \$T(\$L$requiredArguments)", selfClass, CONTEXT_PARAMETER_NAME)
                 .build()
         builder.addMethod(createMethod)
     }
@@ -91,7 +98,7 @@ class ClassBuilder(className: String) {
      *
      * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
-    fun createOptionalMethods(optionalElements: Array<Element>): ClassBuilder = this.apply {
+    fun createOptionalMethods(optionalElements: List<Element>): ClassBuilder = this.apply {
     }
 
     /**
@@ -99,7 +106,7 @@ class ClassBuilder(className: String) {
      */
     fun createBuildMethod(classSpec: ClassName): ClassBuilder = this.apply {
         val buildMethod = MethodSpec.methodBuilder(Constant.BUILD_METHOD_NAME)
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(PUBLIC)
                 .returns(INTENT_CLASS)
                 .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, classSpec)
                 // Bundleでいろいろやる

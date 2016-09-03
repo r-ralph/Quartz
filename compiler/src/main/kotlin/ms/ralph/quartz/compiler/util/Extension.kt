@@ -16,6 +16,8 @@
 
 package ms.ralph.quartz.compiler.util
 
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.ParameterSpec
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
 import javax.lang.model.util.Elements
@@ -25,6 +27,9 @@ import javax.tools.Diagnostic
 
 fun Element.getPackageName(elements: Elements): String =
         elements.getPackageOf(this).qualifiedName.toString()
+
+fun List<Element>.mapToParameterSpec(): List<ParameterSpec> =
+        map { ParameterSpec.builder(ClassName.get(it.asType()), it.simpleName.toString()).build() }
 
 // Messager
 

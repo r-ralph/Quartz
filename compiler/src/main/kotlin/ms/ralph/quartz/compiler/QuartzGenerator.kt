@@ -44,7 +44,7 @@ object QuartzGenerator {
         val requiredElements = searchRequiredElements(element)
         val optionalElements = searchOptionalElements(element)
 
-        val classInfo = ClassBuilder(className)
+        val classInfo = ClassBuilder(packageName, className)
                 .setSignature()
                 .createFields(requiredElements, optionalElements)
                 .createConstructor(requiredElements)
@@ -60,7 +60,7 @@ object QuartzGenerator {
      *
      * @param element Annotated class information
      */
-    private fun searchRequiredElements(element: Element): Array<Element> {
+    private fun searchRequiredElements(element: Element): List<Element> {
         return searchElement(element, Required::class.java)
     }
 
@@ -69,7 +69,7 @@ object QuartzGenerator {
      *
      * @param element Annotated class information
      */
-    private fun searchOptionalElements(element: Element): Array<Element> {
+    private fun searchOptionalElements(element: Element): List<Element> {
         return searchElement(element, Optional::class.java)
     }
 
@@ -79,12 +79,12 @@ object QuartzGenerator {
      * @param element Annotated class information
      * @param klass   Annotation class
      */
-    private fun searchElement(element: Element, klass: Class<out Annotation>): Array<Element> {
+    private fun searchElement(element: Element, klass: Class<out Annotation>): List<Element> {
         val list = arrayListOf<Element>()
         element.enclosedElements.forEach {
             it.getAnnotation(klass)?.apply { list.add(it) }
         }
-        return list.toTypedArray()
+        return list.toList()
 
     }
 }
