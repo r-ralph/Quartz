@@ -78,17 +78,17 @@ class ClassBuilder(className: String) {
     /**
      * Create constructor with <code>Context</code> and element annotated with <code>@Required</code>
      *
-     * @param classSpec        Class information of generated class
+     * @param selfClassSpec    Class information of generated class
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createCreateMethod(classSpec: ClassName, requiredElements: List<Element>): ClassBuilder = this.apply {
+    fun createCreateMethod(selfClassSpec: ClassName, requiredElements: List<Element>): ClassBuilder = this.apply {
         val requiredArguments = requiredElements.map { it.simpleName.toString() }.joinToString(", ", ", ")
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
-                .returns(classSpec)
+                .returns(selfClassSpec)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
                 .addParameters(requiredElements.mapToParameterSpec())
-                .addStatement("return new \$T(\$L$requiredArguments)", classSpec, CONTEXT_PARAMETER_NAME)
+                .addStatement("return new \$T(\$L$requiredArguments)", selfClassSpec, CONTEXT_PARAMETER_NAME)
                 .build()
         builder.addMethod(createMethod)
     }
@@ -96,9 +96,20 @@ class ClassBuilder(className: String) {
     /**
      * Create methods for determining optional parameters
      *
+     * @param selfClassSpec    Class information of generated class
      * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
-    fun createOptionalMethods(optionalElements: List<Element>): ClassBuilder = this.apply {
+    fun createOptionalMethods(selfClassSpec: ClassName, optionalElements: List<Element>): ClassBuilder = this.apply {
+        val optionalMethods = optionalElements.map {
+            MethodSpec.methodBuilder(it.simpleName.toString())
+                    .addModifiers(PUBLIC)
+                    .returns(selfClassSpec)
+                    .addParameter(ParameterSpec.builder(ClassName.get(it.asType()), it.simpleName.toString()).build())
+                    .addStatement("this.\$L = \$L", it.simpleName.toString(), it.simpleName.toString())
+                    .addStatement("return this")
+                    .build()
+        }
+        builder.addMethods(optionalMethods)
     }
 
     /**

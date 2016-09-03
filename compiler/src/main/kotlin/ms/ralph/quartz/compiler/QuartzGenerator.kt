@@ -49,7 +49,7 @@ object QuartzGenerator {
                 .createFields(requiredElements, optionalElements)
                 .createConstructor(requiredElements)
                 .createCreateMethod(classSpec, requiredElements)
-                .createOptionalMethods(optionalElements)
+                .createOptionalMethods(classSpec, optionalElements)
                 .createBuildMethod(ClassName.get(packageName, element.simpleName.toString()))
                 .build()
         return JavaFile.builder(packageName, classInfo).build()
