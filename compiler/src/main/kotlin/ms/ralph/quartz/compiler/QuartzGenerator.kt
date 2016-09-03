@@ -21,12 +21,9 @@ import com.squareup.javapoet.JavaFile
 import ms.ralph.quartz.Optional
 import ms.ralph.quartz.Required
 import ms.ralph.quartz.compiler.util.Constant.CLASS_NAME_SUFFIX
-import ms.ralph.quartz.compiler.util.error
 import ms.ralph.quartz.compiler.util.note
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
-import javax.lang.model.element.Modifier.PRIVATE
-import javax.lang.model.element.Modifier.STATIC
 
 /**
  * Code generator class
@@ -47,17 +44,23 @@ object QuartzGenerator {
         val requiredElements = searchRequiredElements(element)
         val optionalElements = searchOptionalElements(element)
 
-        // Check all field is not private or static
+        // Check all field is not private, static or final
+        // FIXME: Kotlin's field is always private(getter and setter are public)
+        /*
         val checkFunc: (Element) -> Unit = {
             val modifiers = it.modifiers
-            if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-                val message = "${it.simpleName} must not be private or static"
+            modifiers.forEach {
+                messager.note(it.name)
+            }
+            if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC) || modifiers.contains(FINAL)) {
+                val message = "${it.simpleName} must not be private, static or final"
                 messager.error(message)
                 throw IllegalAccessException(message)
             }
         }
         requiredElements.forEach(checkFunc)
         optionalElements.forEach(checkFunc)
+        */
 
         val classInfo = ClassBuilder(className)
                 .setSignature()
