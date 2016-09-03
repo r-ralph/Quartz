@@ -31,4 +31,14 @@ object ClassReference {
      * Class information of Context
      */
     internal val CONTEXT_CLASS = ClassName.get("android.content", "Context")
+
+    /**
+     * Class information of Bundle
+     */
+    internal val BUNDLE_CLASS = ClassName.get("android.os", "Bundle")
+
+    /**
+     * Class information of QuartzUtil
+     */
+    internal val QUARTZ_UTIL_CLASS = ClassName.get("ms.ralph.quartz", "QuartzUtil")
 }

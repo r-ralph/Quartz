@@ -36,6 +36,11 @@ object Constant {
     internal val INTENT_PARAMETER_NAME = "intent"
 
     /**
+     * Bundle variable name
+     */
+    internal val BUNDLE_PARAMETER_NAME = "bundle"
+
+    /**
      * Builder instantiate method name
      */
     internal val CREATE_METHOD_NAME = "create"
@@ -44,4 +49,14 @@ object Constant {
      * Builder build method name
      */
     internal val BUILD_METHOD_NAME = "build"
+
+    /**
+     * Intent#putExtras method name
+     */
+    internal val PUT_EXTRAS_METHOD_NAME = "putExtras"
+
+    /**
+     * Quartz#put method name
+     */
+    internal val PUT_METHOD_NAME = "put"
 }

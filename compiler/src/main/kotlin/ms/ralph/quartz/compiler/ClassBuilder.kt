@@ -17,12 +17,17 @@
 package ms.ralph.quartz.compiler
 
 import com.squareup.javapoet.*
+import ms.ralph.quartz.compiler.util.ClassReference.BUNDLE_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.CONTEXT_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.INTENT_CLASS
+import ms.ralph.quartz.compiler.util.ClassReference.QUARTZ_UTIL_CLASS
 import ms.ralph.quartz.compiler.util.Constant
+import ms.ralph.quartz.compiler.util.Constant.BUNDLE_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CONTEXT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CREATE_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.INTENT_PARAMETER_NAME
+import ms.ralph.quartz.compiler.util.Constant.PUT_EXTRAS_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.PUT_METHOD_NAME
 import ms.ralph.quartz.compiler.util.mapToParameterSpec
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier.*
@@ -35,6 +40,11 @@ class ClassBuilder(className: String) {
      * Class builder
      */
     val builder: TypeSpec.Builder = TypeSpec.classBuilder(className)
+
+    /**
+     * Container of generated FieldSpec
+     */
+    val fields = arrayListOf<FieldSpec>()
 
     /**
      * Set modifier to <code>public final</code> class
@@ -51,12 +61,13 @@ class ClassBuilder(className: String) {
      */
     fun createFields(requiredElements: List<Element>, optionalElements: List<Element>): ClassBuilder = this.apply {
         builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, PRIVATE).build())
-        requiredElements.forEach {
-            builder.addField(FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build())
+        val fieldRegister: (Element) -> Unit = {
+            val field = FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build()
+            fields.add(field)
+            builder.addField(field)
         }
-        optionalElements.forEach {
-            builder.addField(FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build())
-        }
+        requiredElements.forEach(fieldRegister)
+        optionalElements.forEach(fieldRegister)
     }
 
     /**
@@ -122,7 +133,9 @@ class ClassBuilder(className: String) {
                 .addModifiers(PUBLIC)
                 .returns(INTENT_CLASS)
                 .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, activityClassSpec)
-                // Bundleでいろいろやる
+                .addStatement("\$T \$L = new \$T()", BUNDLE_CLASS, BUNDLE_PARAMETER_NAME, BUNDLE_CLASS)
+                .apply { fields.forEach { addStatement("\$T.\$N(\$N, \$N)", QUARTZ_UTIL_CLASS, PUT_METHOD_NAME, BUNDLE_PARAMETER_NAME, it.name) } }
+                .addStatement("\$L.\$N(\$L)", INTENT_PARAMETER_NAME, PUT_EXTRAS_METHOD_NAME, BUNDLE_PARAMETER_NAME)
                 .addStatement("return \$L", INTENT_PARAMETER_NAME)
                 .build()
         builder.addMethod(buildMethod)
