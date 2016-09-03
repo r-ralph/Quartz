@@ -18,11 +18,13 @@ package ms.ralph.quartz.sample
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import ms.ralph.quartz.Quartz
 
-class MainActivity : AppCompatActivity() {
+@Quartz
+class SubActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_sub)
     }
 }

@@ -23,6 +23,9 @@ import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 
+/**
+ * Code generator class
+ */
 object QuartzGenerator {
     fun createJavaFile(packageName: String, element: Element, messager: Messager): JavaFile {
         val className = "${element.simpleName}IntentBuilder"
