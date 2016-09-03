@@ -44,13 +44,13 @@ object QuartzGenerator {
         val requiredElements = searchRequiredElements(element)
         val optionalElements = searchOptionalElements(element)
 
-        val classInfo = ClassBuilder(packageName, className)
+        val classInfo = ClassBuilder(className)
                 .setSignature()
                 .createFields(requiredElements, optionalElements)
                 .createConstructor(requiredElements)
-                .createCreateMethod(requiredElements)
+                .createCreateMethod(classSpec, requiredElements)
                 .createOptionalMethods(optionalElements)
-                .createBuildMethod(classSpec)
+                .createBuildMethod(ClassName.get(packageName, element.simpleName.toString()))
                 .build()
         return JavaFile.builder(packageName, classInfo).build()
     }

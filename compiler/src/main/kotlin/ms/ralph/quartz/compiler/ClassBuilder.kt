@@ -30,7 +30,7 @@ import javax.lang.model.element.Modifier.*
 /**
  * Wrapper of TypeSpec.Builder
  */
-class ClassBuilder(val packageName: String, val className: String) {
+class ClassBuilder(className: String) {
     /**
      * Class builder
      */
@@ -78,17 +78,17 @@ class ClassBuilder(val packageName: String, val className: String) {
     /**
      * Create constructor with <code>Context</code> and element annotated with <code>@Required</code>
      *
+     * @param classSpec        Class information of generated class
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createCreateMethod(requiredElements: List<Element>): ClassBuilder = this.apply {
-        val selfClass = ClassName.get(packageName, className)
+    fun createCreateMethod(classSpec: ClassName, requiredElements: List<Element>): ClassBuilder = this.apply {
         val requiredArguments = requiredElements.map { it.simpleName.toString() }.joinToString(", ", ", ")
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
-                .returns(selfClass)
+                .returns(classSpec)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
                 .addParameters(requiredElements.mapToParameterSpec())
-                .addStatement("return new \$T(\$L$requiredArguments)", selfClass, CONTEXT_PARAMETER_NAME)
+                .addStatement("return new \$T(\$L$requiredArguments)", classSpec, CONTEXT_PARAMETER_NAME)
                 .build()
         builder.addMethod(createMethod)
     }
@@ -103,12 +103,14 @@ class ClassBuilder(val packageName: String, val className: String) {
 
     /**
      * Create <code>build</code> method
+     *
+     * @param activityClassSpec Class information of activity class
      */
-    fun createBuildMethod(classSpec: ClassName): ClassBuilder = this.apply {
+    fun createBuildMethod(activityClassSpec: ClassName): ClassBuilder = this.apply {
         val buildMethod = MethodSpec.methodBuilder(Constant.BUILD_METHOD_NAME)
                 .addModifiers(PUBLIC)
                 .returns(INTENT_CLASS)
-                .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, classSpec)
+                .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, activityClassSpec)
                 // Bundleでいろいろやる
                 .addStatement("return \$L", INTENT_PARAMETER_NAME)
                 .build()
