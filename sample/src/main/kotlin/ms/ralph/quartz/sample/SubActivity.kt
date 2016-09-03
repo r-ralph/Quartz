@@ -18,10 +18,18 @@ package ms.ralph.quartz.sample
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import ms.ralph.quartz.Optional
 import ms.ralph.quartz.Quartz
+import ms.ralph.quartz.Required
 
 @Quartz
 class SubActivity : AppCompatActivity() {
+
+    @Required
+    var requiredField: String? = null
+
+    @Optional
+    var optionalField: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
