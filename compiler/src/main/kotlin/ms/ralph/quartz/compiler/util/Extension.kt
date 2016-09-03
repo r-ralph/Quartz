@@ -40,3 +40,15 @@ fun Messager.warn(text: String) = printMessage(Diagnostic.Kind.WARNING, text)
 fun Messager.error(text: String) = printMessage(Diagnostic.Kind.ERROR, text)
 
 fun Messager.other(text: String) = printMessage(Diagnostic.Kind.OTHER, text)
+
+fun String.upperCase(i: Int): String {
+    var str = ""
+    if (i != 0) {
+        str = substring(0, i - 1)
+    }
+    str += toCharArray()[i].toUpperCase()
+    if (i != length - 1) {
+        str += substring(i + 1, length)
+    }
+    return str
+}

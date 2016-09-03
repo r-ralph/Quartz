@@ -24,6 +24,10 @@ object Constant {
      * Suffix of generated class
      */
     internal val CLASS_NAME_SUFFIX = "IntentBuilder"
+    /**
+     * Prefix of setter
+     */
+    internal val SETTER_PREFIX = "set"
 
     /**
      * Context parameter name
@@ -41,6 +45,11 @@ object Constant {
     internal val BUNDLE_PARAMETER_NAME = "bundle"
 
     /**
+     * Activity variable name
+     */
+    internal val ACTIVITY_PARAMETER_NAME = "activity"
+
+    /**
      * Builder instantiate method name
      */
     internal val CREATE_METHOD_NAME = "create"
@@ -49,6 +58,11 @@ object Constant {
      * Builder build method name
      */
     internal val BUILD_METHOD_NAME = "build"
+
+    /**
+     * Builder restore method name
+     */
+    internal val RESTORE_METHOD_NAME = "restore"
 
     /**
      * Intent#putExtras method name

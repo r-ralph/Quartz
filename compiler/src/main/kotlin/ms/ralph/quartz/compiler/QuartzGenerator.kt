@@ -69,6 +69,7 @@ object QuartzGenerator {
                 .createCreateMethod(classSpec, requiredElements)
                 .createOptionalMethods(classSpec, optionalElements)
                 .createBuildMethod(ClassName.get(packageName, element.simpleName.toString()))
+                .createRestoreMethod(ClassName.get(packageName, element.simpleName.toString()))
                 .build()
         return JavaFile.builder(packageName, classInfo).build()
     }

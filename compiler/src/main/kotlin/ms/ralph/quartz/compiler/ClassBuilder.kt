@@ -17,18 +17,24 @@
 package ms.ralph.quartz.compiler
 
 import com.squareup.javapoet.*
+import ms.ralph.quartz.Optional
+import ms.ralph.quartz.Required
 import ms.ralph.quartz.compiler.util.ClassReference.BUNDLE_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.CONTEXT_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.INTENT_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.QUARTZ_UTIL_CLASS
 import ms.ralph.quartz.compiler.util.Constant
+import ms.ralph.quartz.compiler.util.Constant.ACTIVITY_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.BUNDLE_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CONTEXT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CREATE_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.INTENT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.PUT_EXTRAS_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.PUT_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.RESTORE_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.SETTER_PREFIX
 import ms.ralph.quartz.compiler.util.mapToParameterSpec
+import ms.ralph.quartz.compiler.util.upperCase
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier.*
 
@@ -44,7 +50,7 @@ class ClassBuilder(className: String) {
     /**
      * Container of generated FieldSpec
      */
-    val fields = arrayListOf<FieldSpec>()
+    val fields = arrayListOf<Pair<FieldSpec, Element>>()
 
     /**
      * Set modifier to <code>public final</code> class
@@ -63,7 +69,7 @@ class ClassBuilder(className: String) {
         builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, PRIVATE).build())
         val fieldRegister: (Element) -> Unit = {
             val field = FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build()
-            fields.add(field)
+            fields.add(field.to(it))
             builder.addField(field)
         }
         requiredElements.forEach(fieldRegister)
@@ -134,11 +140,38 @@ class ClassBuilder(className: String) {
                 .returns(INTENT_CLASS)
                 .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, activityClassSpec)
                 .addStatement("\$T \$L = new \$T()", BUNDLE_CLASS, BUNDLE_PARAMETER_NAME, BUNDLE_CLASS)
-                .apply { fields.forEach { addStatement("\$T.\$N(\$N, \$S, \$N)", QUARTZ_UTIL_CLASS, PUT_METHOD_NAME, BUNDLE_PARAMETER_NAME, it.name.toUpperCase(), it.name) } }
+                .apply { fields.forEach { addStatement("\$T.\$N(\$N, \$S, \$N)", QUARTZ_UTIL_CLASS, PUT_METHOD_NAME, BUNDLE_PARAMETER_NAME, it.first.name.toUpperCase(), it.first.name) } }
                 .addStatement("\$L.\$N(\$L)", INTENT_PARAMETER_NAME, PUT_EXTRAS_METHOD_NAME, BUNDLE_PARAMETER_NAME)
                 .addStatement("return \$L", INTENT_PARAMETER_NAME)
                 .build()
         builder.addMethod(buildMethod)
+    }
+
+    /**
+     * Create <code>restore</code> method for restoring data from Intent
+     *
+     * @param activityClassSpec Class information of activity class
+     */
+    fun createRestoreMethod(activityClassSpec: ClassName): ClassBuilder = this.apply {
+        val restoreMethod = MethodSpec.methodBuilder(RESTORE_METHOD_NAME)
+                .addModifiers(PUBLIC, STATIC)
+                .addParameter(activityClassSpec, ACTIVITY_PARAMETER_NAME)
+                .apply {
+                    fields.forEach {
+                        val setterName = it.second.getAnnotation(Required::class.java)?.setter?.let { if (it.length == 0) null else it }
+                                ?: it.second.getAnnotation(Optional::class.java)?.setter?.let { if (it.length == 0) null else it }
+                                ?: if (it.second.modifiers.contains(PRIVATE)) "$SETTER_PREFIX${it.second.simpleName.toString().upperCase(0)}" else null
+                        if (setterName.isNullOrEmpty()) {
+                            // Direct access
+                            addStatement("\$N.\$N = null", ACTIVITY_PARAMETER_NAME, it.second.simpleName)
+                        } else {
+                            // Access via setter
+                            addStatement("\$N.\$N(null)", ACTIVITY_PARAMETER_NAME, setterName)
+                        }
+                    }
+                }
+                .build()
+        builder.addMethod(restoreMethod)
     }
 
     /**
