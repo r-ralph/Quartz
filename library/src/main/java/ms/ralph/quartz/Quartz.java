@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package ms.ralph.quartz.sample
+package ms.ralph.quartz;
 
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.CLASS)
+public @interface Quartz {
 }

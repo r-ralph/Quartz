@@ -1,3 +1,5 @@
-<manifest package="ms.ralph.quartz">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="ms.ralph.quartz">
 
+    <uses-sdk tools:overrideLibrary="android.support.v4" />
 </manifest>
