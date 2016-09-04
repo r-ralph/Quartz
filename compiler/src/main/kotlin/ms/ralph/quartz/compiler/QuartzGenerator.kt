@@ -21,7 +21,6 @@ import com.squareup.javapoet.JavaFile
 import ms.ralph.quartz.Optional
 import ms.ralph.quartz.Required
 import ms.ralph.quartz.compiler.util.Constant.CLASS_NAME_SUFFIX
-import ms.ralph.quartz.compiler.util.note
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
 
@@ -36,10 +35,10 @@ object QuartzGenerator {
      * @param element     Annotated class information
      * @param messager    Logger object
      */
-    fun createJavaFile(packageName: String, element: Element, messager: Messager): JavaFile {
+    fun createJavaFile(packageName: String, element: Element, @Suppress("UNUSED_PARAMETER") messager: Messager): JavaFile {
         val className = "${element.simpleName}$CLASS_NAME_SUFFIX"
         val classSpec = ClassName.get(packageName, className)
-        messager.note("Start: $className")
+        val activityClassSpec = ClassName.get(packageName, element.simpleName.toString())
 
         val requiredElements = searchRequiredElements(element)
         val optionalElements = searchOptionalElements(element)
@@ -62,14 +61,14 @@ object QuartzGenerator {
         optionalElements.forEach(checkFunc)
         */
 
-        val classInfo = ClassBuilder(className)
+        val classInfo = ClassBuilder(classSpec, requiredElements, optionalElements, activityClassSpec)
                 .setSignature()
-                .createFields(requiredElements, optionalElements)
-                .createConstructor(requiredElements)
-                .createCreateMethod(classSpec, requiredElements)
-                .createOptionalMethods(classSpec, optionalElements)
-                .createBuildMethod(ClassName.get(packageName, element.simpleName.toString()))
-                .createRestoreMethod(ClassName.get(packageName, element.simpleName.toString()))
+                .createFields()
+                .createConstructor()
+                .createCreateMethod()
+                .createOptionalMethods()
+                .createBuildMethod()
+                .createRestoreMethod()
                 .build()
         return JavaFile.builder(packageName, classInfo).build()
     }

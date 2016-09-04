@@ -45,11 +45,30 @@ import javax.lang.model.element.Modifier.*
 /**
  * Wrapper of TypeSpec.Builder
  */
-class ClassBuilder(className: String) {
+class ClassBuilder(
+        /**
+         * Class information of generated class
+         */
+        val classSpec: ClassName,
+
+        /**
+         * Field information that is annotated with <code>@Required</code>
+         */
+        val requiredElements: List<Element>,
+        /**
+         * Field information that is annotated with <code>@Optional</code>
+         */
+        val optionalElements: List<Element>,
+
+        /**
+         * Class information of activity class
+         */
+        val activityClassSpec: ClassName) {
+
     /**
      * Class builder
      */
-    val builder: TypeSpec.Builder = TypeSpec.classBuilder(className)
+    val builder: TypeSpec.Builder = TypeSpec.classBuilder(classSpec)
 
     /**
      * Container of generated FieldSpec
@@ -65,11 +84,8 @@ class ClassBuilder(className: String) {
 
     /**
      * Create fields
-     *
-     * @param requiredElements Field information that is annotated with <code>@Required</code>
-     * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
-    fun createFields(requiredElements: List<Element>, optionalElements: List<Element>): ClassBuilder = this.apply {
+    fun createFields(): ClassBuilder = this.apply {
         builder.addField(FieldSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME, PRIVATE).build())
         val fieldRegister: (Element) -> Unit = {
             val field = FieldSpec.builder(ClassName.get(it.asType()), it.simpleName.toString(), PRIVATE).build()
@@ -82,10 +98,8 @@ class ClassBuilder(className: String) {
 
     /**
      * Create constructor with <code>Context</code> and element annotated with <code>@Required</code>
-     *
-     * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createConstructor(requiredElements: List<Element>): ClassBuilder = this.apply {
+    fun createConstructor(): ClassBuilder = this.apply {
         val constructor = MethodSpec.constructorBuilder()
                 .addModifiers(PRIVATE)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
@@ -98,33 +112,27 @@ class ClassBuilder(className: String) {
 
     /**
      * Create constructor with <code>Context</code> and element annotated with <code>@Required</code>
-     *
-     * @param selfClassSpec    Class information of generated class
-     * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
-    fun createCreateMethod(selfClassSpec: ClassName, requiredElements: List<Element>): ClassBuilder = this.apply {
+    fun createCreateMethod(): ClassBuilder = this.apply {
         val requiredArguments = requiredElements.map { it.simpleName.toString() }.run { if (size != 0) joinToString(", ", ", ") else "" }
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
-                .returns(selfClassSpec)
+                .returns(classSpec)
                 .addParameter(ParameterSpec.builder(CONTEXT_CLASS, CONTEXT_PARAMETER_NAME).build())
                 .addParameters(requiredElements.mapToParameterSpec())
-                .addStatement("return new \$T(\$L$requiredArguments)", selfClassSpec, CONTEXT_PARAMETER_NAME)
+                .addStatement("return new \$T(\$L$requiredArguments)", classSpec, CONTEXT_PARAMETER_NAME)
                 .build()
         builder.addMethod(createMethod)
     }
 
     /**
      * Create methods for determining optional parameters
-     *
-     * @param selfClassSpec    Class information of generated class
-     * @param optionalElements Field information that is annotated with <code>@Optional</code>
      */
-    fun createOptionalMethods(selfClassSpec: ClassName, optionalElements: List<Element>): ClassBuilder = this.apply {
+    fun createOptionalMethods(): ClassBuilder = this.apply {
         val optionalMethods = optionalElements.map {
             MethodSpec.methodBuilder(it.simpleName.toString())
                     .addModifiers(PUBLIC)
-                    .returns(selfClassSpec)
+                    .returns(classSpec)
                     .addParameter(ParameterSpec.builder(ClassName.get(it.asType()), it.simpleName.toString()).build())
                     .addStatement("this.\$L = \$L", it.simpleName.toString(), it.simpleName.toString())
                     .addStatement("return this")
@@ -135,10 +143,8 @@ class ClassBuilder(className: String) {
 
     /**
      * Create <code>build</code> method
-     *
-     * @param activityClassSpec Class information of activity class
      */
-    fun createBuildMethod(activityClassSpec: ClassName): ClassBuilder = this.apply {
+    fun createBuildMethod(): ClassBuilder = this.apply {
         val buildMethod = MethodSpec.methodBuilder(BUILD_METHOD_NAME)
                 .addModifiers(PUBLIC)
                 .returns(INTENT_CLASS)
@@ -153,10 +159,8 @@ class ClassBuilder(className: String) {
 
     /**
      * Create <code>restore</code> method for restoring data from Intent
-     *
-     * @param activityClassSpec Class information of activity class
      */
-    fun createRestoreMethod(activityClassSpec: ClassName): ClassBuilder = this.apply {
+    fun createRestoreMethod(): ClassBuilder = this.apply {
         val restoreMethod = MethodSpec.methodBuilder(RESTORE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
                 .addParameter(activityClassSpec, ACTIVITY_PARAMETER_NAME)
