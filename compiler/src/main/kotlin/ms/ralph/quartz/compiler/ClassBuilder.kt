@@ -103,7 +103,7 @@ class ClassBuilder(className: String) {
      * @param requiredElements Field information that is annotated with <code>@Required</code>
      */
     fun createCreateMethod(selfClassSpec: ClassName, requiredElements: List<Element>): ClassBuilder = this.apply {
-        val requiredArguments = requiredElements.map { it.simpleName.toString() }.joinToString(", ", ", ")
+        val requiredArguments = requiredElements.map { it.simpleName.toString() }.run { if (size != 0) joinToString(", ", ", ") else "" }
         val createMethod = MethodSpec.methodBuilder(CREATE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
                 .returns(selfClassSpec)
