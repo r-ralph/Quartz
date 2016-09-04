@@ -15,7 +15,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SubActivity" />
+        <activity android:name=".Sub1Activity" />
+        <activity android:name=".Sub2Activity" />
+        <activity android:name=".Sub3Activity" />
+        <activity android:name=".Sub4Activity" />
+        <activity android:name=".Sub5Activity" />
+        <activity android:name=".Sub6Activity" />
+        <activity android:name=".Sub7Activity" />
+        <activity android:name=".Sub8Activity" />
+        <activity android:name=".Sub9Activity" />
+        <activity android:name=".Sub10Activity" />
+        <activity android:name=".Sub11Activity" />
     </application>
 
 </manifest>
