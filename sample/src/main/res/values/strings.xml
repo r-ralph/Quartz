@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Quartz Sample</string>
+    <string name="label_sub1">No Argument</string>
+    <string name="label_sub2">1 Required, 0 Optional\nJava</string>
+    <string name="label_sub3">1 Required, 0 Optional\nKotlin</string>
+    <string name="label_sub4">0 Required, 1 Optional\nJava</string>
+    <string name="label_sub5">0 Required, 1 Optional\nKotlin</string>
+    <string name="label_sub6">1 Required, 1 Optional\nJava</string>
+    <string name="label_sub7">1 Required, 1 Optional\nKotlin</string>
+    <string name="label_sub8">2 Required, 2 Optional (Use only one)\nJava</string>
+    <string name="label_sub9">2 Required, 2 Optional (Use only one)\nKotlin</string>
+    <string name="label_sub10">1 Required, 1 Optional (Specify setter)\nJava</string>
+    <string name="label_sub11">1 Required, 1 Optional (Specify setter)\nKotlin</string>
 </resources>

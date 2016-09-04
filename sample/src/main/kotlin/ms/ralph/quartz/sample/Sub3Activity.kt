@@ -16,16 +16,34 @@
 
 package ms.ralph.quartz.sample
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.TextView
 import ms.ralph.quartz.Quartz
+import ms.ralph.quartz.Required
 
+/**
+ * Sample activity written with Kotlin
+ * 1 Required and 0 Optional
+ */
 @Quartz
-class Sub1Activity : AppCompatActivity() {
+class Sub3Activity : AppCompatActivity() {
+
+    @Required
+    var required1: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sub)
-        Sub1ActivityIntentBuilder.restore(this)
+        Sub3ActivityIntentBuilder.restore(this)
+
+        setText()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setText() {
+        val textView = findViewById(R.id.textView) as TextView
+        textView.text = "required1: $required1"
     }
 }
