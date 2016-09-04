@@ -1,7 +1,7 @@
 # Quartz
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Download](https://api.bintray.com/packages/r-ralph/maven/quartz/images/download.svg) ](https://bintray.com/hr-ralph/maven/quartz/_latestVersion)
+[![Download](https://api.bintray.com/packages/r-ralph/maven/quartz/images/download.svg) ](https://bintray.com/r-ralph/maven/quartz/_latestVersion)
 [![Build Status](https://travis-ci.org/r-ralph/Quartz.svg?branch=master)](https://travis-ci.org/r-ralph/Quartz)
 
 Quartz is annotation-based library for generating Intent builder.
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
 The field annotated with `@Required` or `@Optional` must not be `private`, `static`, `final`.
 
-Exceptionally, `private` modifire is only available when setter method is available. (Looks [here](#use-in-private-field-with-setter))
+Exceptionally, `private` modifire is only available when setter method is available. (Looks [here](#use-in-private-field-with-setter)
 
 ### 2. Delegate to generated class
 
@@ -127,7 +127,7 @@ dependencies {
 ```
 
 
-## Licence
+## License
 
 ```
 Copyright 2016 Ralph (Tamaki Hidetsugu)
