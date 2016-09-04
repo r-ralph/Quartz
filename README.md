@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
 The field annotated with `@Required` or `@Optional` must not be `private`, `static`, `final`.
 
-Exceptionally, `private` modifire is only available when setter method is available. (Looks [here](#use-in-private-field-with-setter)
+Exceptionally, `private` modifire is only available when setter method is available. (Looks [here](#use-in-private-field-with-setter))
 
 ### 2. Delegate to generated class
 
