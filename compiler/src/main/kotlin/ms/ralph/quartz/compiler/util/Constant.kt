@@ -70,7 +70,27 @@ object Constant {
     internal val PUT_EXTRAS_METHOD_NAME = "putExtras"
 
     /**
-     * Quartz#put method name
+     * Intent#getExtras method name
+     */
+    internal val GET_EXTRAS_METHOD_NAME = "getExtras"
+
+    /**
+     * Bundle#containsKey method name
+     */
+    internal val CONTAINS_KEY_METHOD_NAME = "containsKey"
+
+    /**
+     * Activity#getIntent method name
+     */
+    internal val GET_INTENT_METHOD_NAME = "getIntent"
+
+    /**
+     * QuartzUtil#put method name
      */
     internal val PUT_METHOD_NAME = "put"
+
+    /**
+     * QuartzUtil#get method name
+     */
+    internal val GET_METHOD_NAME = "get"
 }

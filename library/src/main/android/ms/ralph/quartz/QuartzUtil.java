@@ -119,6 +119,32 @@ public class QuartzUtil {
         }
     }
 
+
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    public static <T> T get(@NonNull Bundle bundle, @NonNull String key, @NonNull Class<T> klass) {
+        T object;
+        if (klass == Boolean[].class) {
+            object = (T) convert(bundle.getBooleanArray(key));
+        } else if (klass == Byte[].class) {
+            object = (T) convert(bundle.getByteArray(key));
+        } else if (klass == Short[].class) {
+            object = (T) convert(bundle.getShortArray(key));
+        } else if (klass == Integer[].class) {
+            object = (T) convert(bundle.getIntArray(key));
+        } else if (klass == Long[].class) {
+            object = (T) convert(bundle.getLongArray(key));
+        } else if (klass == Float[].class) {
+            object = (T) convert(bundle.getFloatArray(key));
+        } else if (klass == Double[].class) {
+            object = (T) convert(bundle.getDoubleArray(key));
+        } else if (klass == Character[].class) {
+            object = (T) convert(bundle.getCharArray(key));
+        } else {
+            object = (T) bundle.get(key);
+        }
+        return object;
+    }
+
     /**
      * Check object is {@literal ArrayList<? extends Parcelable>}
      *
@@ -306,5 +332,117 @@ public class QuartzUtil {
             primitiveArray[i] = array[i];
         }
         return primitiveArray;
+    }
+
+    /**
+     * Convert {@literal boolean[]} to {@literal Boolean[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Boolean[] convert(@NonNull boolean[] primitiveArray) {
+        Boolean[] array = new Boolean[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal byte[]} to {@literal Byte[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Byte[] convert(@NonNull byte[] primitiveArray) {
+        Byte[] array = new Byte[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal short[]} to {@literal Short[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Short[] convert(@NonNull short[] primitiveArray) {
+        Short[] array = new Short[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal int[]} to {@literal Integer[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Integer[] convert(@NonNull int[] primitiveArray) {
+        Integer[] array = new Integer[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal long[]} to {@literal Long[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Long[] convert(@NonNull long[] primitiveArray) {
+        Long[] array = new Long[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal float[]} to {@literal Float[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Float[] convert(@NonNull float[] primitiveArray) {
+        Float[] array = new Float[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal double[]} to {@literal Double[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Double[] convert(@NonNull double[] primitiveArray) {
+        Double[] array = new Double[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
+    }
+
+    /**
+     * Convert {@literal char[]} to {@literal Character[]}
+     *
+     * @param primitiveArray Object to be converted
+     * @return Converted array
+     */
+    private static Character[] convert(@NonNull char[] primitiveArray) {
+        Character[] array = new Character[primitiveArray.length];
+        for (int i = 0; i < primitiveArray.length; i++) {
+            array[i] = primitiveArray[i];
+        }
+        return array;
     }
 }

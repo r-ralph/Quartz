@@ -25,9 +25,13 @@ import ms.ralph.quartz.compiler.util.ClassReference.INTENT_CLASS
 import ms.ralph.quartz.compiler.util.ClassReference.QUARTZ_UTIL_CLASS
 import ms.ralph.quartz.compiler.util.Constant
 import ms.ralph.quartz.compiler.util.Constant.ACTIVITY_PARAMETER_NAME
+import ms.ralph.quartz.compiler.util.Constant.BUILD_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.BUNDLE_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CONTEXT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.CREATE_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.GET_EXTRAS_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.GET_INTENT_METHOD_NAME
+import ms.ralph.quartz.compiler.util.Constant.GET_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.INTENT_PARAMETER_NAME
 import ms.ralph.quartz.compiler.util.Constant.PUT_EXTRAS_METHOD_NAME
 import ms.ralph.quartz.compiler.util.Constant.PUT_METHOD_NAME
@@ -135,7 +139,7 @@ class ClassBuilder(className: String) {
      * @param activityClassSpec Class information of activity class
      */
     fun createBuildMethod(activityClassSpec: ClassName): ClassBuilder = this.apply {
-        val buildMethod = MethodSpec.methodBuilder(Constant.BUILD_METHOD_NAME)
+        val buildMethod = MethodSpec.methodBuilder(BUILD_METHOD_NAME)
                 .addModifiers(PUBLIC)
                 .returns(INTENT_CLASS)
                 .addStatement("\$T \$L = new \$T(\$L, \$T.class)", INTENT_CLASS, INTENT_PARAMETER_NAME, INTENT_CLASS, CONTEXT_PARAMETER_NAME, activityClassSpec)
@@ -156,18 +160,26 @@ class ClassBuilder(className: String) {
         val restoreMethod = MethodSpec.methodBuilder(RESTORE_METHOD_NAME)
                 .addModifiers(PUBLIC, STATIC)
                 .addParameter(activityClassSpec, ACTIVITY_PARAMETER_NAME)
+                .addStatement("\$T \$N = \$N.\$N().\$N()", BUNDLE_CLASS, BUNDLE_PARAMETER_NAME, ACTIVITY_PARAMETER_NAME, GET_INTENT_METHOD_NAME, GET_EXTRAS_METHOD_NAME)
+                .beginControlFlow("if (\$N == null)", BUNDLE_PARAMETER_NAME)
+                .apply {
+                    addStatement("return")
+                }.endControlFlow()
                 .apply {
                     fields.forEach {
                         val setterName = it.second.getAnnotation(Required::class.java)?.setter?.let { if (it.isBlank()) null else it }
                                 ?: it.second.getAnnotation(Optional::class.java)?.setter?.let { if (it.isBlank()) null else it }
                                 ?: if (it.second.modifiers.contains(PRIVATE)) "$SETTER_PREFIX${it.second.simpleName.toString().upperCase(0)}" else null
+                        val key = it.first.name.toUpperCase()
+                        beginControlFlow("if (\$N.\$N(\$S))", BUNDLE_PARAMETER_NAME, Constant.CONTAINS_KEY_METHOD_NAME, key)
                         if (setterName.isNullOrEmpty()) {
                             // Direct access
-                            addStatement("\$N.\$N = null", ACTIVITY_PARAMETER_NAME, it.second.simpleName)
+                            addStatement("\$N.\$N = \$T.\$N(\$N, \$S, \$T.class)", ACTIVITY_PARAMETER_NAME, it.second.simpleName, QUARTZ_UTIL_CLASS, GET_METHOD_NAME, BUNDLE_PARAMETER_NAME, key, it.second.asType())
                         } else {
                             // Access via setter
-                            addStatement("\$N.\$N(null)", ACTIVITY_PARAMETER_NAME, setterName)
+                            addStatement("\$N.\$N(\$T.\$N(\$N, \$S, \$T.class))", ACTIVITY_PARAMETER_NAME, setterName, QUARTZ_UTIL_CLASS, GET_METHOD_NAME, BUNDLE_PARAMETER_NAME, key, it.second.asType())
                         }
+                        endControlFlow()
                     }
                 }
                 .build()
@@ -175,7 +187,7 @@ class ClassBuilder(className: String) {
     }
 
     /**
-     * Build <code>MethodSpec</code>
+     * Build <code>TypeSpec</code>
      */
     fun build(): TypeSpec = builder.build()
 }
