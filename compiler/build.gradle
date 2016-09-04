@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.github.ben-manes.versions'
 
 targetCompatibility = JavaVersion.VERSION_1_6
@@ -20,4 +21,28 @@ sourceSets {
             ]
         }
     }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+publish {
+    userOrg = USER
+    groupId = GROUP_ID
+    artifactId = ARTIFACT_ID_COMPILER
+    version = VERSION
+    description = DESCRIPTION
+    website = WEBSITE
 }

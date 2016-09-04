@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'android-apt'
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.github.ben-manes.versions'
 
 android {
@@ -39,4 +40,33 @@ android {
 dependencies {
     compile "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
     testCompile 'junit:junit:4.12'
+}
+
+publish {
+    userOrg = USER
+    groupId = GROUP_ID
+    artifactId = ARTIFACT_ID_LIBRARY
+    version = VERSION
+    description = DESCRIPTION
+    website = WEBSITE
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
