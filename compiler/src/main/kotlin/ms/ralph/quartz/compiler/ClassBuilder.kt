@@ -158,8 +158,8 @@ class ClassBuilder(className: String) {
                 .addParameter(activityClassSpec, ACTIVITY_PARAMETER_NAME)
                 .apply {
                     fields.forEach {
-                        val setterName = it.second.getAnnotation(Required::class.java)?.setter?.let { if (it.length == 0) null else it }
-                                ?: it.second.getAnnotation(Optional::class.java)?.setter?.let { if (it.length == 0) null else it }
+                        val setterName = it.second.getAnnotation(Required::class.java)?.setter?.let { if (it.isBlank()) null else it }
+                                ?: it.second.getAnnotation(Optional::class.java)?.setter?.let { if (it.isBlank()) null else it }
                                 ?: if (it.second.modifiers.contains(PRIVATE)) "$SETTER_PREFIX${it.second.simpleName.toString().upperCase(0)}" else null
                         if (setterName.isNullOrEmpty()) {
                             // Direct access
